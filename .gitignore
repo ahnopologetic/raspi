@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Secrets
+.env
+
+# Distribution
+dist/
+*.egg-info/
+
+# macOS
+.DS_Store
+
+# Pi artifacts
+screenlog.*

@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "raspi"
+version = "0.1.0"
+description = "CLI to manage your Raspberry Pi home network hub"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.15",
+    "rich>=13",
+    "python-dotenv>=1",
+]
+
+[project.scripts]
+raspi = "raspi:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-mock>=3",
+    "ruff>=0.11",
+    "mypy>=1",
+    "pre-commit>=4",
+]
+
+[tool.uv]
+package = true
+default-groups = ["dev"]
+
+# ── Ruff ────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["raspi"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ── MyPy ────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disable_error_code = []
+
+# ── Pytest ──────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
