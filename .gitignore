@@ -10,6 +10,12 @@ __pycache__/
 dist/
 *.egg-info/
 
+# Tooling caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.serena/
+
 # macOS
 .DS_Store
 

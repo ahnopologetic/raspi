@@ -1,0 +1,16 @@
+[Unit]
+Description=Set static IP for access point
+After=network-online.target hostapd.service
+Wants=network-online.target
+Requires=hostapd.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/bin/bash -c 'for i in $(seq 1 10); do ip link show wlan0 | grep -q UP && exit 0; sleep 1; done; exit 1'
+ExecStart=/usr/sbin/ip addr replace 192.168.50.1/24 dev wlan0
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

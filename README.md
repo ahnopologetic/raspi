@@ -1,44 +1,63 @@
 # raspi
 
-> CLI to manage a Raspberry Pi home network hub from anywhere via Tailscale.
+> Turn a Raspberry Pi into a Tailscale subnet router + Wi-Fi access point, then manage it with a CLI.
 
-## What it does
-
-- **`raspi status`** — check if your Pi is online, see IP and Wi-Fi info
-- **`raspi connect`** — open an interactive SSH session (via Tailscale)
-- **`raspi info`** — system details: uptime, disk, memory, CPU temp
-- **`raspi scan`** — hunt for your Pi on the local network by MAC address
-- **`raspi exec "..."`** — run any command on the Pi remotely
-
-## Quick start
+## One-line install (on a fresh Pi)
 
 ```bash
-git clone <repo-url>
+curl -sSL https://raw.githubusercontent.com/ahnopologetic/raspi/main/setup.sh | sudo bash
+```
+
+With custom values:
+
+```bash
+AP_SSID="MyDen" AP_PASS="hunter2"            \
+WIFI_SSID="MyWiFi" WIFI_PASS="p@ssword"      \
+TAILSCALE_AUTHKEY="tskey-..."                 \
+curl -sSL https://raw.githubusercontent.com/ahnopologetic/raspi/main/setup.sh | sudo bash
+```
+
+## What it sets up
+
+| Component | Interface | Purpose |
+|-----------|-----------|---------|
+| Tailscale subnet router | `tailscale0` | Access your home network from anywhere |
+| Wi-Fi access point | `wlan0` (built-in) | Devices connect here (TV, speakers, etc.) |
+| Upstream Wi-Fi client | `wlan1` (USB dongle) | Connects to your building/home Wi-Fi |
+| NAT + DHCP | `hostapd` + `dnsmasq` | AP clients get internet via upstream |
+
+Requires: Raspberry Pi 4/5 + USB Wi-Fi dongle (RTL8188 or similar).
+
+## CLI (optional — runs on your laptop)
+
+```bash
+git clone https://github.com/ahnopologetic/raspi
 cd raspi
-cp .env.example .env
-# edit .env with your Pi's details
+cp .env.example .env    # fill in your Pi's Tailscale IP
 uv sync
 uv run raspi status
 ```
 
+Commands: `status`, `connect`, `scan`, `info`, `exec`
+
+## Structure
+
+```
+├── setup.sh              ← provision a Pi from scratch
+├── conf/                 ← config templates
+│   ├── hostapd.conf
+│   ├── dnsmasq.conf
+│   ├── networkmanager.conf
+│   └── systemd/ap-ip.service
+├── src/raspi/            ← Python CLI (typer + rich)
+├── tests/
+└── SETUP.md              ← detailed walkthrough
+```
+
 ## Requirements
 
-- [uv](https://docs.astral.sh/uv/) for package management
-- A Raspberry Pi with [Tailscale](https://tailscale.com) installed
-- SSH key added to your Pi for passwordless access
-
-## Configuration
-
-Copy `.env.example` to `.env` and set:
-
-| Variable | Description |
-|----------|-------------|
-| `RASPI_TAILSCALE_IP` | Your Pi's Tailscale IP (`tailscale status`) |
-| `RASPI_USER` | SSH username on the Pi |
-| `RASPI_HOSTNAME` | Pi hostname (for mDNS) |
-| `RASPI_MAC` | Pi's Wi-Fi MAC for local scanning |
-| `RASPI_BUILDING_SUBNET` | Subnet to scan in CIDR notation |
-
-## Setup guide
-
-See [SETUP.md](SETUP.md) for a detailed walkthrough of setting up a Pi as a Tailscale subnet router and Wi-Fi access point — including lessons learned from real-world gotchas.
+- Raspberry Pi 4 Model B (or Pi 5)
+- USB Wi-Fi dongle (RTL8188EUS, MT7601, or similar)
+- Raspberry Pi OS (64-bit, Bookworm or newer)
+- [Tailscale](https://tailscale.com) account (free tier works)
+- [uv](https://docs.astral.sh/uv/) (for CLI only)
