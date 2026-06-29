@@ -224,6 +224,9 @@ UNITEOF
 systemctl daemon-reload
 systemctl enable ap-ip
 systemctl restart ap-ip
+sleep 1
+# Ensure dnsmasq binds to the now-assigned IP
+systemctl restart dnsmasq
 ok "Static IP $AP_IP assigned to wlan0"
 
 # ── NAT / Routing ────────────────────────────────────────────────────
